@@ -49,4 +49,12 @@ inputButtons.forEach(button => button.addEventListener('click', function (e) { /
 }));
 
 
+function clear() {
+    input = "";
+    instructionDisplay.textContent = input;
+}
+
+const clearButton = document.querySelector(".clear");
+clearButton.addEventListener('click', clear);
+
 
