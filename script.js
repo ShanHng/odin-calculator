@@ -1,3 +1,46 @@
+// elements for dom manipulation
+const instructionDisplay = document.querySelector(".instruction");
+const resultDisplay = document.querySelector(".results");
+const numberButtons = document.querySelectorAll("button.number");
+const mathButtons = document.querySelectorAll("button.math");
+const equalButton = document.querySelector(".equal");
+const clearButton = document.querySelector(".clear");
+
+// variables used in logic
+let operand1;
+let operand2;
+let operator = '';
+
+let instructionCache = "";
+let numberCache = "";
+
+numberButtons.forEach(button => button.addEventListener('click', function (e) { // using e => doesnt work for some reason https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery?rq=2
+    // code for updating insturction display
+    updateInstructionCache(this.textContent);
+    updateInstructionDisplay(instructionCache);
+
+    // code for updating current number user is typing
+    updateNumberCache(this.textContent);
+}));
+
+mathButtons.forEach(button => button.addEventListener('click', function (e) { // using e => doesnt work for some reason https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery?rq=2
+    updateInstructionCache(this.textContent);
+    updateInstructionDisplay(instructionCache);
+    evaluate();
+    clearNumberCache();
+    updateCurrentOperator(this.textContent);
+}));
+
+equalButton.addEventListener('click', (e) => {
+    evaluate();
+    clearNumberCache();
+    showResults();
+    updateCurrentOperator("");
+    clearInstructionCache();
+});
+
+clearButton.addEventListener('click', clear);
+
 // Mathematical functions
 function add(a, b) {
     return a + b;
@@ -18,12 +61,9 @@ function divide(a, b) {
     return a / b;
 }
 
-
-let operand1;
-let operand2;
-let operator = '';
-
+// Helper functions 
 function operate(op1, op2, operator) {
+    if (op1 === 'ERROR') return 'ERROR';
     switch(operator) {
         case '+':
             return add(op1, op2);
@@ -40,65 +80,54 @@ function operate(op1, op2, operator) {
     }
 }
 
-const instructionDisplay = document.querySelector(".instruction");
-const resultDisplay = document.querySelector(".results");
-
-let wholeInput = "";
-let curNum = "";
-const isFirstOperator = () => length(operator) === 0;
-
-const numberButtons = document.querySelectorAll("button.number");
-numberButtons.forEach(button => button.addEventListener('click', function (e) { // using e => doesnt work for some reason https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery?rq=2
-    // code for updating insturction display
-    wholeInput += this.textContent;
-    instructionDisplay.textContent = wholeInput;
-
-    // code for updating current number user is typing
-    curNum += this.textContent;
-}));
-
-const mathButtons = document.querySelectorAll("button.math");
-mathButtons.forEach(button => button.addEventListener('click', function (e) { // using e => doesnt work for some reason https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery?rq=2
-    wholeInput += this.textContent;
-    instructionDisplay.textContent = wholeInput;
-
-    evaluate();
-    operator = this.textContent;
-}));
-
 function evaluate() {
     if (!operator) { 
-        operand1 = Number(curNum);  
+        operand1 = Number(numberCache);  
     } else {
-        operand2 = Number(curNum);
+        operand2 = Number(numberCache);
         operand1 = operate(operand1, operand2, operator);
-    }
-    curNum = '';  
+    } 
+}
+
+function clear() {
+    clearInstructionCache();
+    updateInstructionDisplay();
+    clearNumberCache();
+    updateResultsDisplay('');
 }
 
 function showResults() {
-    wholeInput = '';
-    resultDisplay.textContent = operand1;
+    // only rounds when necessary. code reuse from https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
+    // @author A Kunin
+    resultDisplay.textContent = +operand1.toFixed(8); 
 }
 
-const equalButton = document.querySelector(".equal");
-equalButton.addEventListener('click', (e) => {
-    evaluate();
-    showResults();
-    operator = "";
-});
-
-function clear() {
-    wholeInput = "";
-    instructionDisplay.textContent = wholeInput;
-    resultDisplay.textContent = '';
+function clearInstructionCache() {
+    instructionCache = '';
 }
 
-const clearButton = document.querySelector(".clear");
-clearButton.addEventListener('click', clear);
+function updateInstructionCache(string) {
+    instructionCache += string;
+}
 
+function updateInstructionDisplay() {
+    instructionDisplay.textContent = instructionCache;
+}
 
+function updateResultsDisplay(string) {
+    resultDisplay.textContent = string;
+}
 
+function updateCurrentOperator(string) {
+    operator = string;
+}
 
+function clearNumberCache() {
+    numberCache = '';
+}
+
+function updateNumberCache(string) {
+    numberCache += string;
+}
 
 
