@@ -39,3 +39,14 @@ function operate(op1, op2, operator) {
             break;
     }
 }
+
+let input = "";
+const inputButtons = document.querySelectorAll("button.number, button.math");
+const instructionDisplay = document.querySelector(".instruction");
+inputButtons.forEach(button => button.addEventListener('click', function (e) { // using e => doesnt work for some reason https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery?rq=2
+    input += this.textContent;
+    instructionDisplay.textContent = input;
+}));
+
+
+
