@@ -13,6 +13,7 @@ let operator = '';
 
 let instructionCache = "";
 let numberCache = "";
+let resultCache = 0;
 
 numberButtons.forEach(button => button.addEventListener('click', function (e) { // using e => doesnt work for some reason https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery?rq=2
     // code for updating insturction display
@@ -32,10 +33,15 @@ mathButtons.forEach(button => button.addEventListener('click', function (e) { //
 }));
 
 equalButton.addEventListener('click', (e) => {
-    evaluate();
-    clearNumberCache();
+    if (!instructionCache) {
+        showResults();    
+        return; 
+    }
+    const result = evaluate();
+    updateResultCache(result);
     showResults();
     updateCurrentOperator("");
+    clearNumberCache();
     clearInstructionCache();
 });
 
@@ -83,9 +89,11 @@ function operate(op1, op2, operator) {
 function evaluate() {
     if (!operator) { 
         operand1 = Number(numberCache);  
+        return operand1;
     } else {
         operand2 = Number(numberCache);
         operand1 = operate(operand1, operand2, operator);
+        return operand1;
     } 
 }
 
@@ -94,12 +102,13 @@ function clear() {
     updateInstructionDisplay();
     clearNumberCache();
     updateResultsDisplay('');
+    clearResultCache();
 }
 
 function showResults() {
     // only rounds when necessary. code reuse from https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
     // @author A Kunin
-    resultDisplay.textContent = +operand1.toFixed(8); 
+    resultDisplay.textContent = +resultCache.toFixed(8); 
 }
 
 function clearInstructionCache() {
@@ -128,6 +137,14 @@ function clearNumberCache() {
 
 function updateNumberCache(string) {
     numberCache += string;
+}
+
+function updateResultCache(string) {
+    resultCache = string;
+}
+
+function clearResultCache() {
+    resultCache = 0;
 }
 
 
